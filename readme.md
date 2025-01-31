@@ -15,7 +15,7 @@ Pequena aplicação node para desenvolver os conhecimentos vistos no módulo de 
 
 ## ⚙️ Funcionalidades
 
-- [ ] Criação de uma Tarefa
+- [x] Criação de uma Tarefa
 - [ ] Listagem de Tarefas
 - [ ] Edição de Tarefas
 - [ ] Remoção de Tarefas
