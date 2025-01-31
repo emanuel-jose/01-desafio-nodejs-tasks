@@ -23,7 +23,7 @@ Pequena aplicação node para desenvolver os conhecimentos vistos no módulo de 
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Linguagem/Framework:** Node.js
+- **Linguagem/Framework:** Javascript
 - **Bibliotecas:** csv-parse
 
 ## 🚀 Instalação e Execução
