@@ -9,7 +9,19 @@ export const routes = [
     method: "GET",
     path: buildRoutePath("/tasks"),
     handler: (req, res) => {
-      res.end();
+      const { title, description } = req.query;
+
+      const tasks = database.select(
+        "tasks",
+        title || description
+          ? {
+              title,
+              description,
+            }
+          : null
+      );
+
+      res.end(JSON.stringify(tasks));
     },
   },
   {
@@ -47,21 +59,70 @@ export const routes = [
     method: "PUT",
     path: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
-      res.end();
+      const { id } = req.params;
+      const { title, description } = req.body;
+
+      const idVerification = database.verifyIdIfExists("tasks", id);
+
+      if (!idVerification) {
+        return res.writeHead(404).end(
+          JSON.stringify({
+            message: "Tarefa não encontrada!",
+          })
+        );
+      }
+
+      if (!title && !description) {
+        return res.writeHead(400).end(
+          JSON.stringify({
+            message:
+              "Dados obrigatórios não foram passados: title, description",
+          })
+        );
+      }
+
+      database.update("tasks", id, { title, description });
+      return res.writeHead(204).end();
     },
   },
   {
     method: "PATCH",
     path: buildRoutePath("/tasks/:id/complete"),
     handler: (req, res) => {
-      res.end();
+      const { id } = req.params;
+      const idVerification = database.verifyIdIfExists("tasks", id);
+
+      if (!idVerification) {
+        return res.writeHead(404).end(
+          JSON.stringify({
+            message: "Tarefa não encontrada!",
+          })
+        );
+      }
+
+      database.complete("tasks", id);
+
+      return res.writeHead(204).end();
     },
   },
   {
     method: "DELETE",
     path: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
-      res.end();
+      const { id } = req.params;
+      const idVerification = database.verifyIdIfExists("tasks", id);
+
+      if (!idVerification) {
+        return res.writeHead(404).end(
+          JSON.stringify({
+            message: "Tarefa não encontrada!",
+          })
+        );
+      }
+
+      database.delete("tasks", id);
+
+      return res.writeHead(204).end();
     },
   },
 ];

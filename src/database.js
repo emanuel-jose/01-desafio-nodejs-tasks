@@ -17,19 +17,20 @@ export class Database {
     fs.writeFile(databasePath, JSON.stringify(this.#database));
   }
 
-  select(table, searchTitle, searchDescription) {
+  select(table, search) {
     let data = this.#database[table] ?? [];
 
-    if (searchTitle) {
+    if (search) {
       data = data.filter((row) => {
         return Object.entries(search).some(([key, value]) => {
-          return row[key].toLowerCase().includes(value.toLowerCase());
+          if (value) {
+            return row[key].toLowerCase().includes(value.toLowerCase());
+          }
         });
       });
     }
 
-    // veriificar a parte de search da descrição da task
-    console.log(data);
+    return data;
   }
 
   insert(table, data) {
@@ -48,16 +49,36 @@ export class Database {
     const rowIndex = this.#database[table].findIndex((row) => row.id === id);
 
     if (rowIndex > -1) {
-      this.#database[table][rowIndex] = { id, ...data };
+      const task = this.#database[table][rowIndex];
+      console.log({ task });
+      this.#database[table][rowIndex] = {
+        ...task,
+        id,
+        title: data.title ?? task.title,
+        description: data.description ?? task.description,
+        updated_at: new Date(),
+      };
       this.#persist();
     }
   }
 
-  complete(table, id, data) {
+  verifyIdIfExists(table, id) {
+    const rowIndex = this.#database[table].findIndex((row) => row.id === id);
+
+    if (rowIndex > -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  complete(table, id) {
     const rowIndex = this.#database[table].findIndex((row) => row.id === id);
     let isCompleted = null;
 
-    if (data.completed_at === null) {
+    const task = this.#database[table][rowIndex];
+
+    if (task.completed_at === null) {
       isCompleted = new Date();
     } else {
       isCompleted = null;
@@ -65,9 +86,9 @@ export class Database {
 
     if (rowIndex > -1) {
       this.#database[table][rowIndex] = {
+        ...task,
         id,
         completed_at: isCompleted,
-        ...data,
       };
     }
   }
